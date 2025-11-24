@@ -3,22 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema Comercial - Produtos</title>
+    <title>Armazém do Seu Zé - Produtos</title>
     <link rel="stylesheet" href="css/styles.css">
 </head>
 <body data-page="produtos">
     <header class="topbar">
         <div class="brand">
-            <span class="brand__logo" aria-hidden="true">SC</span>
+            <span class="brand__logo" aria-hidden="true">SZ</span>
             <div>
-                <strong>Sistema Comercial</strong>
-                <p class="brand__subtitle">Gestão simples e conforme ISO 9241</p>
+                <strong>Armazém do Seu Zé (versão digital)</strong>
+                <p class="brand__subtitle">Feito na raça, com café forte e ISO 9241 no coração.</p>
             </div>
         </div>
         <nav class="main-nav" aria-label="Navegação principal">
             <a href="index.html" class="main-nav__link">Início</a>
             <a href="produtos.html" class="main-nav__link main-nav__link--active">Produtos</a>
             <a href="pedidos.html" class="main-nav__link">Pedidos</a>
+            <a href="login.html" class="main-nav__link">Login</a>
+            <a href="registro.html" class="main-nav__link">Registro</a>
         </nav>
     </header>
 
@@ -34,7 +36,7 @@
             <form class="stack" id="product-form" novalidate>
                 <label class="field">
                     <span>Nome *</span>
-                    <input type="text" name="nome" placeholder="Ex.: Café em grãos" required>
+                    <input type="text" name="nome" placeholder="Ex.: Café Turbo do Seu Zé" required>
                     <small class="helper" data-feedback-for="nome"></small>
                 </label>
                 <label class="field">
@@ -79,7 +81,7 @@
     </main>
 
     <footer class="footer">
-        <p>Campos e feedbacks claros para reduzir erros de entrada (ISO 9241-110).</p>
+        <p>Campos honestos, humor duvidoso e ISO 9241-110 debaixo do braço.</p>
     </footer>
 
     <script src="js/app.js"></script>

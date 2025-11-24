@@ -1,25 +1,35 @@
 const STORAGE_KEYS = {
     products: 'sc_products',
-    orders: 'sc_orders'
+    orders: 'sc_orders',
+    profile: 'sc_profile'
 };
 
 const defaultProducts = [
-    { nome: 'Café em grãos', preco: 32.9, estoque: 25 },
-    { nome: 'Chá verde', preco: 18.5, estoque: 40 },
-    { nome: 'Filtro de papel', preco: 8.9, estoque: 60 }
+    { nome: 'Café Turbo do Seu Zé', preco: 32.9, estoque: 25 },
+    { nome: 'Chá Zen da Dona Rita', preco: 18.5, estoque: 40 },
+    { nome: 'Filtro Ninja Anti-Poeira', preco: 8.9, estoque: 60 }
 ];
 
 const defaultOrders = [
-    { cliente: 'Ana Silva', produto: 'Café em grãos', quantidade: 2, total: 65.8 },
-    { cliente: 'Bruno Lima', produto: 'Filtro de papel', quantidade: 5, total: 44.5 }
+    { cliente: 'Dona Maricota da Quitanda', produto: 'Café Turbo do Seu Zé', quantidade: 2, total: 65.8 },
+    { cliente: 'Seu Madruga Empreendedor', produto: 'Filtro Ninja Anti-Poeira', quantidade: 5, total: 44.5 }
 ];
 
 function loadFromStorage(key, fallback) {
     try {
         const stored = localStorage.getItem(key);
-        if (!stored) return fallback;
+        if (stored === null) return fallback;
+
         const parsed = JSON.parse(stored);
-        return Array.isArray(parsed) ? parsed : fallback;
+        if (Array.isArray(fallback)) {
+            return Array.isArray(parsed) ? parsed : fallback;
+        }
+
+        if (typeof fallback === 'object' && fallback !== null) {
+            return typeof parsed === 'object' && parsed !== null ? parsed : fallback;
+        }
+
+        return parsed ?? fallback;
     } catch (e) {
         return fallback;
     }
@@ -41,9 +51,19 @@ function showFeedback(field, message) {
     field.setAttribute('aria-invalid', message ? 'true' : 'false');
 }
 
+function setAlert(element, message) {
+    if (!element) return;
+    element.textContent = message;
+    element.hidden = !message;
+}
+
 function validateField(field) {
     if (!field.value.trim()) {
         showFeedback(field, 'Preencha este campo.');
+        return false;
+    }
+    if (field.minLength > 0 && field.value.length < field.minLength) {
+        showFeedback(field, `Use pelo menos ${field.minLength} caracteres.`);
         return false;
     }
     if (field.type === 'number' && Number(field.value) < Number(field.min || 0)) {
@@ -88,21 +108,21 @@ function refreshHome(products, orders) {
 function renderProducts(products) {
     const list = document.getElementById('product-list');
     const select = document.querySelector('select[name="produto"]');
-    if (!list) return;
-
-    list.innerHTML = '';
-    if (products.length === 0) {
-        list.innerHTML = '<tr><td colspan="3" class="muted">Nenhum produto cadastrado.</td></tr>';
-    } else {
-        products.forEach((produto) => {
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td>${produto.nome}</td>
-                <td>${formatCurrency(produto.preco)}</td>
-                <td>${produto.estoque} un</td>
-            `;
-            list.appendChild(row);
-        });
+    if (list) {
+        list.innerHTML = '';
+        if (products.length === 0) {
+            list.innerHTML = '<tr><td colspan="3" class="muted">Nenhum produto cadastrado.</td></tr>';
+        } else {
+            products.forEach((produto) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${produto.nome}</td>
+                    <td>${formatCurrency(produto.preco)}</td>
+                    <td>${produto.estoque} un</td>
+                `;
+                list.appendChild(row);
+            });
+        }
     }
 
     if (select) {
@@ -267,6 +287,76 @@ function setupActions(products, orders) {
     refresh?.addEventListener('click', () => refreshHome(products, orders));
 }
 
+function setupAuthForms() {
+    const profile = loadFromStorage(STORAGE_KEYS.profile, {});
+    const loginForm = document.getElementById('login-form');
+    const registerForm = document.getElementById('register-form');
+
+    const loginFeedback = document.getElementById('login-feedback');
+    const registerFeedback = document.getElementById('registro-feedback');
+
+    const loginEmail = loginForm?.querySelector('input[name="email"]');
+    if (loginEmail && profile.email) {
+        loginEmail.value = profile.email;
+    }
+
+    if (loginForm) {
+        loginForm.querySelectorAll('input').forEach((input) => {
+            input.addEventListener('blur', () => validateField(input));
+            input.addEventListener('input', () => showFeedback(input, ''));
+        });
+
+        loginForm.addEventListener('submit', (event) => {
+            event.preventDefault();
+            const valid = Array.from(loginForm.elements)
+                .filter((el) => el.tagName === 'INPUT')
+                .every((field) => validateField(field));
+
+            if (!valid) return;
+
+            const data = new FormData(loginForm);
+            const email = data.get('email').trim();
+            const remember = data.get('lembrar');
+
+            saveToStorage(STORAGE_KEYS.profile, { ...profile, email, remember: Boolean(remember) });
+            setAlert(loginFeedback, `Login estiloso liberado para ${email || 'você'}! Café passado e tudo certo.`);
+            loginForm.reset();
+        });
+    }
+
+    if (registerForm) {
+        const password = registerForm.querySelector('input[name="senha"]');
+        const confirm = registerForm.querySelector('input[name="confirmar"]');
+
+        registerForm.querySelectorAll('input').forEach((input) => {
+            input.addEventListener('blur', () => validateField(input));
+            input.addEventListener('input', () => showFeedback(input, ''));
+        });
+
+        registerForm.addEventListener('submit', (event) => {
+            event.preventDefault();
+            const valid = Array.from(registerForm.elements)
+                .filter((el) => el.tagName === 'INPUT')
+                .every((field) => validateField(field));
+
+            if (!valid) return;
+
+            if (password?.value !== confirm?.value) {
+                showFeedback(confirm, 'As senhas precisam combinar.');
+                return;
+            }
+
+            const data = new FormData(registerForm);
+            const nome = data.get('nome').trim();
+            const email = data.get('email').trim();
+
+            saveToStorage(STORAGE_KEYS.profile, { nome, email });
+            setAlert(registerFeedback, `Conta criada, ${nome || 'pessoa misteriosa'}! Pode escolher seu avental favorito.`);
+            registerForm.reset();
+        });
+    }
+}
+
 (function init() {
     const products = loadFromStorage(STORAGE_KEYS.products, defaultProducts);
     const orders = loadFromStorage(STORAGE_KEYS.orders, defaultOrders);
@@ -277,4 +367,5 @@ function setupActions(products, orders) {
     setupProductForm(products, () => refreshHome(products, orders));
     setupOrderForm(products, orders, () => refreshHome(products, orders));
     setupActions(products, orders);
+    setupAuthForms();
 })();
