@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Armazém do Seu Zé - Registro</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body data-page="registro">
+    <header class="topbar">
+        <div class="brand">
+            <span class="brand__logo" aria-hidden="true">SZ</span>
+            <div>
+                <strong>Armazém do Seu Zé (versão digital)</strong>
+                <p class="brand__subtitle">Feito na raça, com café forte e ISO 9241 no coração.</p>
+            </div>
+        </div>
+        <nav class="main-nav" aria-label="Navegação principal">
+            <a href="index.html" class="main-nav__link">Início</a>
+            <a href="produtos.html" class="main-nav__link">Produtos</a>
+            <a href="pedidos.html" class="main-nav__link">Pedidos</a>
+            <a href="login.html" class="main-nav__link">Login</a>
+            <a href="registro.html" class="main-nav__link main-nav__link--active">Registro</a>
+        </nav>
+    </header>
+
+    <main class="layout auth-layout">
+        <section class="panel auth-card" aria-labelledby="registro-title">
+            <div class="panel__header">
+                <div>
+                    <p class="eyebrow">Cadastro</p>
+                    <h1 id="registro-title">Crie sua conta</h1>
+                </div>
+                <p class="muted">Rapidinho, sem burocracia e com um toque de padaria raiz.</p>
+            </div>
+
+            <div class="alert" id="registro-feedback" role="status" aria-live="polite" hidden></div>
+
+            <form class="stack" id="register-form" novalidate>
+                <label class="field">
+                    <span>Nome completo *</span>
+                    <input type="text" name="nome" placeholder="Seu Zé dos Sistemas" required>
+                    <small class="helper" data-feedback-for="nome"></small>
+                </label>
+                <label class="field">
+                    <span>E-mail *</span>
+                    <input type="email" name="email" placeholder="seuze@exemplo.com" required>
+                    <small class="helper" data-feedback-for="email"></small>
+                </label>
+                <label class="field">
+                    <span>Senha *</span>
+                    <input type="password" name="senha" minlength="4" placeholder="••••••••" required>
+                    <small class="helper" data-feedback-for="senha"></small>
+                </label>
+                <label class="field">
+                    <span>Confirmar senha *</span>
+                    <input type="password" name="confirmar" minlength="4" placeholder="••••••••" required>
+                    <small class="helper" data-feedback-for="confirmar"></small>
+                </label>
+                <button type="submit" class="primary">Registrar</button>
+            </form>
+
+            <p class="muted">Já tem conta? <a href="login.html">Faça login</a> e bora organizar o balcão.</p>
+        </section>
+
+        <section class="panel auth-card auth-card--secondary" aria-labelledby="registro-beneficios-title">
+            <div class="panel__header">
+                <div>
+                    <p class="eyebrow">Benefícios</p>
+                    <h2 id="registro-beneficios-title">O que você ganha</h2>
+                </div>
+            </div>
+            <ul class="list">
+                <li>Cadastro de produtos sem fila e sem senha colada no monitor.</li>
+                <li>Pedidos mais rápidos que pãozinho na chapa.</li>
+                <li>Um dashboard que não dorme no ponto.</li>
+            </ul>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <p>Registro sem burocracia, boas piadas e ISO 9241-110 no tempero.</p>
+    </footer>
+
+    <script src="js/app.js"></script>
+</body>
+</html>

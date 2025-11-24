@@ -6,6 +6,8 @@ Projeto front-end responsivo com três telas independentes (Início, Produtos e 
 - `index.html`: visão geral com KPIs e pedidos recentes.
 - `produtos.html`: cadastro e listagem de produtos com validação.
 - `pedidos.html`: registro de pedidos com cálculo automático de total e controle de estoque.
+- `login.html`: tela simples de autenticação com feedback de sucesso.
+- `registro.html`: cadastro básico com checagem de senha e humor alinhado ao tema.
 - `css/styles.css`: tema escuro, layout responsivo e componentes reutilizáveis.
 - `js/app.js`: lógica de persistência em `localStorage`, validações e renderização das tabelas.
 

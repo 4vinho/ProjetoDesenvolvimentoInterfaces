@@ -1,6 +1,7 @@
 const STORAGE_KEYS = {
     products: 'sc_products',
-    orders: 'sc_orders'
+    orders: 'sc_orders',
+    profile: 'sc_profile'
 };
 
 const defaultProducts = [
@@ -17,9 +18,18 @@ const defaultOrders = [
 function loadFromStorage(key, fallback) {
     try {
         const stored = localStorage.getItem(key);
-        if (!stored) return fallback;
+        if (stored === null) return fallback;
+
         const parsed = JSON.parse(stored);
-        return Array.isArray(parsed) ? parsed : fallback;
+        if (Array.isArray(fallback)) {
+            return Array.isArray(parsed) ? parsed : fallback;
+        }
+
+        if (typeof fallback === 'object' && fallback !== null) {
+            return typeof parsed === 'object' && parsed !== null ? parsed : fallback;
+        }
+
+        return parsed ?? fallback;
     } catch (e) {
         return fallback;
     }
@@ -41,9 +51,19 @@ function showFeedback(field, message) {
     field.setAttribute('aria-invalid', message ? 'true' : 'false');
 }
 
+function setAlert(element, message) {
+    if (!element) return;
+    element.textContent = message;
+    element.hidden = !message;
+}
+
 function validateField(field) {
     if (!field.value.trim()) {
         showFeedback(field, 'Preencha este campo.');
+        return false;
+    }
+    if (field.minLength > 0 && field.value.length < field.minLength) {
+        showFeedback(field, `Use pelo menos ${field.minLength} caracteres.`);
         return false;
     }
     if (field.type === 'number' && Number(field.value) < Number(field.min || 0)) {
@@ -267,6 +287,76 @@ function setupActions(products, orders) {
     refresh?.addEventListener('click', () => refreshHome(products, orders));
 }
 
+function setupAuthForms() {
+    const profile = loadFromStorage(STORAGE_KEYS.profile, {});
+    const loginForm = document.getElementById('login-form');
+    const registerForm = document.getElementById('register-form');
+
+    const loginFeedback = document.getElementById('login-feedback');
+    const registerFeedback = document.getElementById('registro-feedback');
+
+    const loginEmail = loginForm?.querySelector('input[name="email"]');
+    if (loginEmail && profile.email) {
+        loginEmail.value = profile.email;
+    }
+
+    if (loginForm) {
+        loginForm.querySelectorAll('input').forEach((input) => {
+            input.addEventListener('blur', () => validateField(input));
+            input.addEventListener('input', () => showFeedback(input, ''));
+        });
+
+        loginForm.addEventListener('submit', (event) => {
+            event.preventDefault();
+            const valid = Array.from(loginForm.elements)
+                .filter((el) => el.tagName === 'INPUT')
+                .every((field) => validateField(field));
+
+            if (!valid) return;
+
+            const data = new FormData(loginForm);
+            const email = data.get('email').trim();
+            const remember = data.get('lembrar');
+
+            saveToStorage(STORAGE_KEYS.profile, { ...profile, email, remember: Boolean(remember) });
+            setAlert(loginFeedback, `Login estiloso liberado para ${email || 'você'}! Café passado e tudo certo.`);
+            loginForm.reset();
+        });
+    }
+
+    if (registerForm) {
+        const password = registerForm.querySelector('input[name="senha"]');
+        const confirm = registerForm.querySelector('input[name="confirmar"]');
+
+        registerForm.querySelectorAll('input').forEach((input) => {
+            input.addEventListener('blur', () => validateField(input));
+            input.addEventListener('input', () => showFeedback(input, ''));
+        });
+
+        registerForm.addEventListener('submit', (event) => {
+            event.preventDefault();
+            const valid = Array.from(registerForm.elements)
+                .filter((el) => el.tagName === 'INPUT')
+                .every((field) => validateField(field));
+
+            if (!valid) return;
+
+            if (password?.value !== confirm?.value) {
+                showFeedback(confirm, 'As senhas precisam combinar.');
+                return;
+            }
+
+            const data = new FormData(registerForm);
+            const nome = data.get('nome').trim();
+            const email = data.get('email').trim();
+
+            saveToStorage(STORAGE_KEYS.profile, { nome, email });
+            setAlert(registerFeedback, `Conta criada, ${nome || 'pessoa misteriosa'}! Pode escolher seu avental favorito.`);
+            registerForm.reset();
+        });
+    }
+}
+
 (function init() {
     const products = loadFromStorage(STORAGE_KEYS.products, defaultProducts);
     const orders = loadFromStorage(STORAGE_KEYS.orders, defaultOrders);
@@ -277,4 +367,5 @@ function setupActions(products, orders) {
     setupProductForm(products, () => refreshHome(products, orders));
     setupOrderForm(products, orders, () => refreshHome(products, orders));
     setupActions(products, orders);
+    setupAuthForms();
 })();

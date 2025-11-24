@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Armazém do Seu Zé - Login</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body data-page="login">
+    <header class="topbar">
+        <div class="brand">
+            <span class="brand__logo" aria-hidden="true">SZ</span>
+            <div>
+                <strong>Armazém do Seu Zé (versão digital)</strong>
+                <p class="brand__subtitle">Feito na raça, com café forte e ISO 9241 no coração.</p>
+            </div>
+        </div>
+        <nav class="main-nav" aria-label="Navegação principal">
+            <a href="index.html" class="main-nav__link">Início</a>
+            <a href="produtos.html" class="main-nav__link">Produtos</a>
+            <a href="pedidos.html" class="main-nav__link">Pedidos</a>
+            <a href="login.html" class="main-nav__link main-nav__link--active">Login</a>
+            <a href="registro.html" class="main-nav__link">Registro</a>
+        </nav>
+    </header>
+
+    <main class="layout auth-layout">
+        <section class="panel auth-card" aria-labelledby="login-title">
+            <div class="panel__header">
+                <div>
+                    <p class="eyebrow">Área de acesso</p>
+                    <h1 id="login-title">Login</h1>
+                </div>
+                <p class="muted">Entre para cuidar do estoque sem perder o humor.</p>
+            </div>
+
+            <div class="alert" id="login-feedback" role="status" aria-live="polite" hidden></div>
+
+            <form class="stack" id="login-form" novalidate>
+                <label class="field">
+                    <span>E-mail *</span>
+                    <input type="email" name="email" placeholder="seuze@exemplo.com" required>
+                    <small class="helper" data-feedback-for="email"></small>
+                </label>
+                <label class="field">
+                    <span>Senha *</span>
+                    <input type="password" name="senha" placeholder="••••••••" minlength="4" required>
+                    <small class="helper" data-feedback-for="senha"></small>
+                </label>
+                <label class="inline">
+                    <input type="checkbox" name="lembrar" value="sim">
+                    <span>Manter cafeteira ligada (lembrar login)</span>
+                </label>
+                <button type="submit" class="primary">Entrar</button>
+            </form>
+
+            <p class="muted">Ainda não tem conta? <a href="registro.html">Abra uma ficha</a> que a gente prepara o café.</p>
+        </section>
+
+        <section class="panel auth-card auth-card--secondary" aria-labelledby="login-dicas-title">
+            <div class="panel__header">
+                <div>
+                    <p class="eyebrow">Dicas do balcão</p>
+                    <h2 id="login-dicas-title">Por que logar?</h2>
+                </div>
+            </div>
+            <ul class="list">
+                <li>Ganhe poderes de gestor e veja o estoque como um raio X.</li>
+                <li>Salve seus produtos favoritos (e o meme do dia) no histórico.</li>
+                <li>Não compartilhe a senha com o papagaio: ele espalha fofoca.</li>
+            </ul>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <p>Login ligeiro, piada pronta e ISO 9241-110 cuidando da ergonomia.</p>
+    </footer>
+
+    <script src="js/app.js"></script>
+</body>
+</html>
