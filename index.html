@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema Comercial - Visão Geral</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body data-page="home">
+    <header class="topbar">
+        <div class="brand">
+            <span class="brand__logo" aria-hidden="true">SC</span>
+            <div>
+                <strong>Sistema Comercial</strong>
+                <p class="brand__subtitle">Gestão simples e conforme ISO 9241</p>
+            </div>
+        </div>
+        <nav class="main-nav" aria-label="Navegação principal">
+            <a href="index.html" class="main-nav__link main-nav__link--active">Início</a>
+            <a href="produtos.html" class="main-nav__link">Produtos</a>
+            <a href="pedidos.html" class="main-nav__link">Pedidos</a>
+        </nav>
+    </header>
+
+    <main class="layout">
+        <section class="panel" aria-labelledby="resumo-title">
+            <div class="panel__header">
+                <div>
+                    <p class="eyebrow">Visão rápida</p>
+                    <h1 id="resumo-title">Resumo operacional</h1>
+                </div>
+                <button type="button" class="ghost" data-action="atualizar-resumo">Atualizar</button>
+            </div>
+            <div class="kpi-grid" role="list">
+                <article class="kpi" role="listitem">
+                    <p class="eyebrow">Receita estimada</p>
+                    <p class="kpi__value" id="kpi-receita">R$ 0,00</p>
+                    <p class="kpi__hint">Atualizado a partir dos pedidos registrados.</p>
+                </article>
+                <article class="kpi" role="listitem">
+                    <p class="eyebrow">Pedidos</p>
+                    <p class="kpi__value" id="kpi-pedidos">0</p>
+                    <p class="kpi__hint">Pedidos confirmados hoje.</p>
+                </article>
+                <article class="kpi" role="listitem">
+                    <p class="eyebrow">Produtos ativos</p>
+                    <p class="kpi__value" id="kpi-produtos">0</p>
+                    <p class="kpi__hint">Itens disponíveis para venda.</p>
+                </article>
+            </div>
+        </section>
+
+        <section class="panel" aria-labelledby="recentes-title">
+            <div class="panel__header">
+                <div>
+                    <p class="eyebrow">Fluxo diário</p>
+                    <h2 id="recentes-title">Pedidos recentes</h2>
+                </div>
+                <a class="ghost" href="pedidos.html">Ir para pedidos</a>
+            </div>
+            <div class="table-wrapper">
+                <table class="data-table" aria-describedby="recentes-title">
+                    <thead>
+                        <tr>
+                            <th scope="col">Cliente</th>
+                            <th scope="col">Produto</th>
+                            <th scope="col">Quantidade</th>
+                            <th scope="col">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody id="recent-orders" aria-live="polite">
+                        <tr>
+                            <td colspan="4" class="muted">Nenhum pedido registrado ainda.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <p>Interface desenvolvida com foco em clareza, feedback imediato e consistência (ISO 9241).</p>
+    </footer>
+
+    <script src="js/app.js"></script>
+</body>
+</html>
