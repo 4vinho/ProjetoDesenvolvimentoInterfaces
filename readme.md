@@ -2,6 +2,9 @@
 
 Portal front-end para compradores acompanharem catálogo, carrinho e pedidos com o bom humor do Seu Zé.
 
+## Dicas de contribuição
+- O repositório força finais de linha em `LF` via `.gitattributes` para evitar conflitos bobos entre sistemas operacionais.
+
 ## Estrutura
 - `index.html`: landing page do cliente com destaques e pedidos recentes.
 - `catalogo.html`: catálogo interativo com carrinho persistente no navegador.
