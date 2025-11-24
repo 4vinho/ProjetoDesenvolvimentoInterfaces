@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Armazém do Seu Zé - Catálogo</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body data-page="catalogo">
+    <header class="topbar">
+        <div class="brand">
+            <span class="brand__logo" aria-hidden="true">SZ</span>
+            <div>
+                <strong>Armazém do Seu Zé (versão digital)</strong>
+                <p class="brand__subtitle">Do balcão para o seu navegador, com piadas inclusas.</p>
+            </div>
+        </div>
+        <nav class="main-nav" aria-label="Navegação principal">
+            <a href="index.html" class="main-nav__link">Início</a>
+            <a href="catalogo.html" class="main-nav__link main-nav__link--active">Catálogo</a>
+            <a href="pedidos.html" class="main-nav__link">Pedidos</a>
+            <a href="login.html" class="main-nav__link">Login</a>
+            <a href="registro.html" class="main-nav__link">Registro</a>
+        </nav>
+    </header>
+
+    <main class="layout layout--two">
+        <section class="panel" aria-labelledby="catalogo-title">
+            <div class="panel__header">
+                <div>
+                    <p class="eyebrow">Para você</p>
+                    <h1 id="catalogo-title">Catálogo do Seu Zé</h1>
+                </div>
+                <p class="muted">Escolha seus itens e adicione ao carrinho. O café vem de brinde.</p>
+            </div>
+
+            <div class="catalog-grid" id="catalog-grid" aria-live="polite">
+                <p class="muted">Buscando as mercadorias no estoque digital...</p>
+            </div>
+        </section>
+
+        <section class="panel" aria-labelledby="carrinho-title">
+            <div class="panel__header">
+                <div>
+                    <p class="eyebrow">Seu carrinho</p>
+                    <h2 id="carrinho-title">Resumo da compra</h2>
+                </div>
+                <span class="pill" id="cart-counter">0 itens</span>
+            </div>
+
+            <div class="stack">
+                <div id="cart-feedback" class="alert" role="status" aria-live="polite" hidden></div>
+                <div class="cart" aria-live="polite">
+                    <div class="cart__list" id="cart-items">
+                        <p class="muted">Carrinho vazio. Bora escolher algo gostoso?</p>
+                    </div>
+                    <div class="cart__footer">
+                        <p class="inline">Total: <strong id="cart-total">R$ 0,00</strong></p>
+                        <button type="button" class="primary" data-action="checkout">Finalizar pedido</button>
+                    </div>
+                    <p class="muted">Seu carrinho fica salvo neste navegador para você continuar depois.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <p>Atendimento digital, trocadilhos analógicos e entrega sob medida.</p>
+    </footer>
+
+    <script src="js/app.js"></script>
+</body>
+</html>

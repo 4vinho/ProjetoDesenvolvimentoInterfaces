@@ -3,74 +3,81 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema Comercial - Visão Geral</title>
+    <title>Armazém do Seu Zé - Portal do Cliente</title>
     <link rel="stylesheet" href="css/styles.css">
 </head>
 <body data-page="home">
     <header class="topbar">
         <div class="brand">
-            <span class="brand__logo" aria-hidden="true">SC</span>
+            <span class="brand__logo" aria-hidden="true">SZ</span>
             <div>
-                <strong>Sistema Comercial</strong>
-                <p class="brand__subtitle">Gestão simples e conforme ISO 9241</p>
+                <strong>Armazém do Seu Zé (versão digital)</strong>
+                <p class="brand__subtitle">Agora aberto para os compradores mais gente boa da internet.</p>
             </div>
         </div>
         <nav class="main-nav" aria-label="Navegação principal">
             <a href="index.html" class="main-nav__link main-nav__link--active">Início</a>
-            <a href="produtos.html" class="main-nav__link">Produtos</a>
+            <a href="catalogo.html" class="main-nav__link">Catálogo</a>
             <a href="pedidos.html" class="main-nav__link">Pedidos</a>
+            <a href="login.html" class="main-nav__link">Login</a>
+            <a href="registro.html" class="main-nav__link">Registro</a>
         </nav>
     </header>
 
     <main class="layout">
-        <section class="panel" aria-labelledby="resumo-title">
+        <section class="panel hero" aria-labelledby="hero-title">
+            <div class="hero__content">
+                <p class="eyebrow">Portal do comprador</p>
+                <h1 id="hero-title">Peça, acompanhe e receba com o carisma do Seu Zé</h1>
+                <p class="muted">Catálogo atualizado, carrinho salvo no navegador e um vendedor virtual que faz piada enquanto você escolhe.</p>
+                <div class="hero__actions">
+                    <a class="primary" href="catalogo.html">Ver catálogo</a>
+                    <a class="ghost" href="pedidos.html">Acompanhar pedidos</a>
+                </div>
+            </div>
+            <div class="hero__card" aria-label="Resumo rápido">
+                <p class="eyebrow">Resumo das suas compras</p>
+                <h2 class="kpi__value" id="kpi-valor">R$ 0,00</h2>
+                <p class="inline"><span id="kpi-pedidos">0</span> pedidos • <span id="kpi-itens">0</span> itens</p>
+                <p class="muted">Contagem feita com base nas compras salvas neste navegador.</p>
+            </div>
+        </section>
+
+        <section class="panel" aria-labelledby="destaques-title">
             <div class="panel__header">
                 <div>
-                    <p class="eyebrow">Visão rápida</p>
-                    <h1 id="resumo-title">Resumo operacional</h1>
+                    <p class="eyebrow">Escolhas certeiras</p>
+                    <h2 id="destaques-title">Produtos em destaque</h2>
                 </div>
-                <button type="button" class="ghost" data-action="atualizar-resumo">Atualizar</button>
+                <a class="ghost" href="catalogo.html">Ir para o catálogo</a>
             </div>
-            <div class="kpi-grid" role="list">
-                <article class="kpi" role="listitem">
-                    <p class="eyebrow">Receita estimada</p>
-                    <p class="kpi__value" id="kpi-receita">R$ 0,00</p>
-                    <p class="kpi__hint">Atualizado a partir dos pedidos registrados.</p>
-                </article>
-                <article class="kpi" role="listitem">
-                    <p class="eyebrow">Pedidos</p>
-                    <p class="kpi__value" id="kpi-pedidos">0</p>
-                    <p class="kpi__hint">Pedidos confirmados hoje.</p>
-                </article>
-                <article class="kpi" role="listitem">
-                    <p class="eyebrow">Produtos ativos</p>
-                    <p class="kpi__value" id="kpi-produtos">0</p>
-                    <p class="kpi__hint">Itens disponíveis para venda.</p>
-                </article>
+            <div class="catalog-grid" id="featured-products" aria-live="polite">
+                <p class="muted">Carregando o bom humor do Seu Zé...</p>
             </div>
         </section>
 
         <section class="panel" aria-labelledby="recentes-title">
             <div class="panel__header">
                 <div>
-                    <p class="eyebrow">Fluxo diário</p>
+                    <p class="eyebrow">Andamento</p>
                     <h2 id="recentes-title">Pedidos recentes</h2>
                 </div>
-                <a class="ghost" href="pedidos.html">Ir para pedidos</a>
+                <a class="ghost" href="pedidos.html">Ver todos</a>
             </div>
             <div class="table-wrapper">
                 <table class="data-table" aria-describedby="recentes-title">
                     <thead>
                         <tr>
+                            <th scope="col">Pedido</th>
                             <th scope="col">Cliente</th>
-                            <th scope="col">Produto</th>
-                            <th scope="col">Quantidade</th>
+                            <th scope="col">Itens</th>
                             <th scope="col">Total</th>
+                            <th scope="col">Status</th>
                         </tr>
                     </thead>
                     <tbody id="recent-orders" aria-live="polite">
                         <tr>
-                            <td colspan="4" class="muted">Nenhum pedido registrado ainda.</td>
+                            <td colspan="5" class="muted">Nenhum pedido registrado ainda.</td>
                         </tr>
                     </tbody>
                 </table>
@@ -79,7 +86,7 @@
     </main>
 
     <footer class="footer">
-        <p>Interface desenvolvida com foco em clareza, feedback imediato e consistência (ISO 9241).</p>
+        <p>Catálogo aberto, piadas fresquinhas e ISO 9241 garantindo conforto até na fila virtual.</p>
     </footer>
 
     <script src="js/app.js"></script>

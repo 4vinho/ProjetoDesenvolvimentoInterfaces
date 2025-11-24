@@ -1,25 +1,28 @@
 const STORAGE_KEYS = {
     products: 'sc_products',
-    orders: 'sc_orders'
+    cart: 'sc_cart',
+    orders: 'sc_orders',
+    profile: 'sc_profile'
 };
 
 const defaultProducts = [
-    { nome: 'Café em grãos', preco: 32.9, estoque: 25 },
-    { nome: 'Chá verde', preco: 18.5, estoque: 40 },
-    { nome: 'Filtro de papel', preco: 8.9, estoque: 60 }
+    { nome: 'Café Turbo do Seu Zé', preco: 32.9, descricao: 'O favorito da vizinhança, desperta até preguiça de domingo.' },
+    { nome: 'Chá Zen da Dona Rita', preco: 18.5, descricao: 'Calma instantânea para reuniões longas (ou sogras).' },
+    { nome: 'Filtro Ninja Anti-Poeira', preco: 8.9, descricao: 'Vai do balcão ao escritório sem espirros pelo caminho.' },
+    { nome: 'Biscoito Risadinha', preco: 12.4, descricao: 'Leve, crocante e com piada pronta em cada pacote.' }
 ];
 
 const defaultOrders = [
-    { cliente: 'Ana Silva', produto: 'Café em grãos', quantidade: 2, total: 65.8 },
-    { cliente: 'Bruno Lima', produto: 'Filtro de papel', quantidade: 5, total: 44.5 }
+    { id: 'PED-1001', cliente: 'Dona Maricota da Quitanda', itens: 3, total: 159.5, status: 'Em rota' },
+    { id: 'PED-1002', cliente: 'Seu Madruga Empreendedor', itens: 2, total: 78.9, status: 'Separando' }
 ];
 
 function loadFromStorage(key, fallback) {
     try {
         const stored = localStorage.getItem(key);
-        if (!stored) return fallback;
+        if (stored === null) return fallback;
         const parsed = JSON.parse(stored);
-        return Array.isArray(parsed) ? parsed : fallback;
+        return parsed ?? fallback;
     } catch (e) {
         return fallback;
     }
@@ -41,9 +44,19 @@ function showFeedback(field, message) {
     field.setAttribute('aria-invalid', message ? 'true' : 'false');
 }
 
+function setAlert(element, message) {
+    if (!element) return;
+    element.textContent = message;
+    element.hidden = !message;
+}
+
 function validateField(field) {
     if (!field.value.trim()) {
         showFeedback(field, 'Preencha este campo.');
+        return false;
+    }
+    if (field.minLength > 0 && field.value.length < field.minLength) {
+        showFeedback(field, `Use pelo menos ${field.minLength} caracteres.`);
         return false;
     }
     if (field.type === 'number' && Number(field.value) < Number(field.min || 0)) {
@@ -54,227 +67,298 @@ function validateField(field) {
     return true;
 }
 
-function refreshHome(products, orders) {
-    const receita = orders.reduce((total, pedido) => total + pedido.total, 0);
-    const kpiReceita = document.getElementById('kpi-receita');
+function getStatusClass(status) {
+    const normalized = status?.toLowerCase() || '';
+    if (normalized.includes('rota')) return 'status--rota';
+    if (normalized.includes('pronto') || normalized.includes('entregue')) return 'status--pronta';
+    return 'status--nova';
+}
+
+function refreshHome(products, orders, cart) {
+    const totalGasto = orders.reduce((acc, order) => acc + (order.total ?? 0), 0);
+    const totalItens = orders.reduce((acc, order) => acc + (order.itens ?? order.quantidade ?? 0), 0);
+
+    const kpiValor = document.getElementById('kpi-valor');
     const kpiPedidos = document.getElementById('kpi-pedidos');
-    const kpiProdutos = document.getElementById('kpi-produtos');
+    const kpiItens = document.getElementById('kpi-itens');
 
-    if (kpiReceita) kpiReceita.textContent = formatCurrency(receita);
+    if (kpiValor) kpiValor.textContent = formatCurrency(totalGasto);
     if (kpiPedidos) kpiPedidos.textContent = orders.length;
-    if (kpiProdutos) kpiProdutos.textContent = products.length;
+    if (kpiItens) kpiItens.textContent = totalItens;
 
-    const recentTable = document.getElementById('recent-orders');
-    if (!recentTable) return;
+    renderFeatured(products);
+    renderOrders(orders, 'recent-orders');
 
-    recentTable.innerHTML = '';
-    if (orders.length === 0) {
-        recentTable.innerHTML = '<tr><td colspan="4" class="muted">Nenhum pedido registrado ainda.</td></tr>';
+    const cartCounter = document.getElementById('cart-counter');
+    if (cartCounter) cartCounter.textContent = `${cart.reduce((sum, item) => sum + item.quantidade, 0)} itens`;
+}
+
+function renderFeatured(products) {
+    const featured = document.getElementById('featured-products');
+    if (!featured) return;
+
+    featured.innerHTML = '';
+    if (products.length === 0) {
+        featured.innerHTML = '<p class="muted">Nenhum produto no momento. O caminhão do Seu Zé está chegando.</p>';
         return;
     }
 
-    orders.slice(-5).reverse().forEach((pedido) => {
-        const row = document.createElement('tr');
-        row.innerHTML = `
-            <td>${pedido.cliente}</td>
-            <td>${pedido.produto}</td>
-            <td>${pedido.quantidade}</td>
-            <td>${formatCurrency(pedido.total)}</td>
+    products.slice(0, 3).forEach((produto) => {
+        const card = document.createElement('article');
+        card.className = 'product-card';
+        card.innerHTML = `
+            <div class="product-card__header">
+                <strong>${produto.nome}</strong>
+                <span class="pill pill--info">Destaque</span>
+            </div>
+            <p class="product-card__price">${formatCurrency(produto.preco)}</p>
+            <p class="muted">${produto.descricao || 'Item selecionado pelo próprio Seu Zé.'}</p>
+            <a class="ghost" href="catalogo.html">Adicionar ao carrinho</a>
         `;
-        recentTable.appendChild(row);
+        featured.appendChild(card);
     });
 }
 
-function renderProducts(products) {
-    const list = document.getElementById('product-list');
-    const select = document.querySelector('select[name="produto"]');
-    if (!list) return;
-
-    list.innerHTML = '';
-    if (products.length === 0) {
-        list.innerHTML = '<tr><td colspan="3" class="muted">Nenhum produto cadastrado.</td></tr>';
-    } else {
-        products.forEach((produto) => {
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td>${produto.nome}</td>
-                <td>${formatCurrency(produto.preco)}</td>
-                <td>${produto.estoque} un</td>
-            `;
-            list.appendChild(row);
-        });
-    }
-
-    if (select) {
-        select.innerHTML = '<option value="">Selecione</option>';
-        products.forEach((produto) => {
-            const option = document.createElement('option');
-            option.value = produto.nome;
-            option.textContent = `${produto.nome} (${formatCurrency(produto.preco)})`;
-            option.dataset.price = produto.preco;
-            select.appendChild(option);
-        });
-    }
-}
-
-function renderOrders(orders) {
-    const list = document.getElementById('order-list');
+function renderOrders(orders, targetId = 'order-history') {
+    const list = document.getElementById(targetId);
     if (!list) return;
 
     list.innerHTML = '';
     if (orders.length === 0) {
-        list.innerHTML = '<tr><td colspan="4" class="muted">Nenhum pedido registrado.</td></tr>';
+        const cols = targetId === 'recent-orders' ? 5 : 5;
+        list.innerHTML = `<tr><td colspan="${cols}" class="muted">Nenhum pedido registrado ainda.</td></tr>`;
         return;
     }
 
-    orders.slice().reverse().forEach((pedido) => {
+    orders.slice().reverse().forEach((order) => {
+        const itens = order.itens ?? order.quantidade ?? 0;
+        const total = order.total ?? 0;
         const row = document.createElement('tr');
         row.innerHTML = `
-            <td>${pedido.cliente}</td>
-            <td>${pedido.produto}</td>
-            <td>${pedido.quantidade}</td>
-            <td>${formatCurrency(pedido.total)}</td>
+            <td>${order.id}</td>
+            <td>${order.cliente}</td>
+            <td>${itens} itens</td>
+            <td>${formatCurrency(total)}</td>
+            <td><span class="status ${getStatusClass(order.status)}">${order.status}</span></td>
         `;
         list.appendChild(row);
     });
 }
 
-function setupProductForm(products, onSave) {
-    const form = document.getElementById('product-form');
-    if (!form) return;
+function renderCatalog(products) {
+    const grid = document.getElementById('catalog-grid');
+    if (!grid) return;
 
-    form.addEventListener('submit', (event) => {
-        event.preventDefault();
-        const data = new FormData(form);
-        const produto = {
-            nome: data.get('nome').trim(),
-            preco: Number(data.get('preco')),
-            estoque: Number(data.get('estoque'))
-        };
+    grid.innerHTML = '';
+    if (products.length === 0) {
+        grid.innerHTML = '<p class="muted">Nenhum produto disponível no momento.</p>';
+        return;
+    }
 
-        const valid = Array.from(form.elements)
-            .filter((el) => el.tagName === 'INPUT')
-            .every((field) => validateField(field));
-
-        if (!valid) return;
-
-        products.push(produto);
-        saveToStorage(STORAGE_KEYS.products, products);
-        renderProducts(products);
-        if (typeof onSave === 'function') onSave();
-        form.reset();
-    });
-
-    form.querySelectorAll('input').forEach((input) => {
-        input.addEventListener('blur', () => validateField(input));
-        input.addEventListener('input', () => showFeedback(input, ''));
+    products.forEach((produto) => {
+        const card = document.createElement('article');
+        card.className = 'product-card';
+        card.innerHTML = `
+            <div class="product-card__header">
+                <strong>${produto.nome}</strong>
+                <span class="product-card__price">${formatCurrency(produto.preco)}</span>
+            </div>
+            <p class="muted">${produto.descricao || ''}</p>
+            <button class="primary" data-action="add-cart" data-product="${produto.nome}">Colocar no carrinho</button>
+        `;
+        grid.appendChild(card);
     });
 }
 
-function setupOrderForm(products, orders, onSave) {
-    const form = document.getElementById('order-form');
-    const totalLabel = document.getElementById('order-total');
-    if (!form || !totalLabel) return;
+function renderCart(cart) {
+    const list = document.getElementById('cart-items');
+    const totalLabel = document.getElementById('cart-total');
+    const counter = document.getElementById('cart-counter');
+    if (!list || !totalLabel) return;
 
-    const productSelect = form.querySelector('select[name="produto"]');
-    const quantityInput = form.querySelector('input[name="quantidade"]');
-
-    function updateTotal() {
-        const selected = productSelect.options[productSelect.selectedIndex];
-        const price = Number(selected?.dataset.price || 0);
-        const qty = Number(quantityInput.value || 0);
-        const total = price * qty;
-        totalLabel.textContent = `Total estimado: ${formatCurrency(total || 0)}`;
+    list.innerHTML = '';
+    if (cart.length === 0) {
+        list.innerHTML = '<p class="muted">Carrinho vazio. Bora escolher algo gostoso?</p>';
+    } else {
+        cart.forEach((item) => {
+            const article = document.createElement('article');
+            article.className = 'cart__item';
+            article.innerHTML = `
+                <header>
+                    <strong>${item.nome}</strong>
+                    <button class="ghost" data-action="remove-item" data-product="${item.nome}">Remover</button>
+                </header>
+                <div class="cart__controls">
+                    <button type="button" class="ghost" data-action="decrease" data-product="${item.nome}">-</button>
+                    <span aria-live="polite">${item.quantidade} un</span>
+                    <button type="button" class="ghost" data-action="increase" data-product="${item.nome}">+</button>
+                    <span class="muted">${formatCurrency(item.preco * item.quantidade)}</span>
+                </div>
+            `;
+            list.appendChild(article);
+        });
     }
 
-    productSelect?.addEventListener('change', () => {
-        validateField(productSelect);
-        updateTotal();
+    const total = cart.reduce((sum, item) => sum + item.preco * item.quantidade, 0);
+    totalLabel.textContent = formatCurrency(total);
+    if (counter) counter.textContent = `${cart.reduce((sum, item) => sum + item.quantidade, 0)} itens`;
+}
+
+function setupCatalog(products, cart, orders) {
+    const grid = document.getElementById('catalog-grid');
+    const cartList = document.getElementById('cart-items');
+    const checkoutBtn = document.querySelector('[data-action="checkout"]');
+    const feedback = document.getElementById('cart-feedback');
+
+    function addToCart(productName) {
+        const produto = products.find((p) => p.nome === productName);
+        if (!produto) return;
+
+        const existing = cart.find((item) => item.nome === productName);
+        if (existing) {
+            existing.quantidade += 1;
+        } else {
+            cart.push({ nome: produto.nome, preco: produto.preco, quantidade: 1 });
+        }
+        saveToStorage(STORAGE_KEYS.cart, cart);
+        renderCart(cart);
+        setAlert(feedback, `${produto.nome} adicionado ao carrinho!`);
+    }
+
+    grid?.addEventListener('click', (event) => {
+        const target = event.target.closest('[data-action="add-cart"]');
+        if (!target) return;
+        const productName = target.getAttribute('data-product');
+        addToCart(productName);
     });
 
-    quantityInput?.addEventListener('input', () => {
-        validateField(quantityInput);
-        updateTotal();
+    cartList?.addEventListener('click', (event) => {
+        const button = event.target.closest('button[data-action]');
+        if (!button) return;
+        const action = button.getAttribute('data-action');
+        const product = button.getAttribute('data-product');
+        const item = cart.find((c) => c.nome === product);
+        if (!item) return;
+
+        if (action === 'increase') item.quantidade += 1;
+        if (action === 'decrease') item.quantidade = Math.max(1, item.quantidade - 1);
+        if (action === 'remove-item') cart.splice(cart.indexOf(item), 1);
+
+        saveToStorage(STORAGE_KEYS.cart, cart);
+        renderCart(cart);
     });
 
-    form.querySelectorAll('input, select').forEach((field) => {
-        field.addEventListener('blur', () => validateField(field));
-        field.addEventListener('input', () => showFeedback(field, ''));
-    });
-
-    form.addEventListener('submit', (event) => {
-        event.preventDefault();
-        const valid = Array.from(form.elements)
-            .filter((el) => el.tagName === 'INPUT' || el.tagName === 'SELECT')
-            .every((field) => validateField(field));
-
-        if (!valid) return;
-
-        const data = new FormData(form);
-        const produtoNome = data.get('produto');
-        const produto = products.find((p) => p.nome === produtoNome);
-        const quantidade = Number(data.get('quantidade'));
-
-        if (!produto) {
-            showFeedback(productSelect, 'Selecione um produto válido.');
+    checkoutBtn?.addEventListener('click', () => {
+        if (cart.length === 0) {
+            setAlert(feedback, 'O carrinho está vazio. Que tal escolher algo?');
             return;
         }
 
-        if (quantidade > produto.estoque) {
-            showFeedback(quantityInput, 'Estoque insuficiente.');
-            return;
-        }
-
-        const total = quantidade * produto.preco;
+        const profile = loadFromStorage(STORAGE_KEYS.profile, {});
+        const total = cart.reduce((sum, item) => sum + item.preco * item.quantidade, 0);
+        const itens = cart.reduce((sum, item) => sum + item.quantidade, 0);
         const novoPedido = {
-            cliente: data.get('cliente').trim(),
-            produto: produto.nome,
-            quantidade,
-            total
+            id: `PED-${Math.floor(Date.now() / 1000)}`,
+            cliente: profile.nome || 'Cliente animado',
+            itens,
+            total,
+            status: 'Aguardando confirmação'
         };
-
-        produto.estoque -= quantidade;
-        saveToStorage(STORAGE_KEYS.products, products);
 
         orders.push(novoPedido);
         saveToStorage(STORAGE_KEYS.orders, orders);
 
-        renderProducts(products);
-        renderOrders(orders);
-        updateTotal();
-        if (typeof onSave === 'function') onSave();
-        form.reset();
-        updateTotal();
+        cart.splice(0, cart.length);
+        saveToStorage(STORAGE_KEYS.cart, cart);
+        renderCart(cart);
+        renderOrders(orders, 'order-history');
+        renderOrders(orders, 'recent-orders');
+        refreshHome(products, orders, cart);
+        setAlert(feedback, 'Pedido criado! Já estamos preparando o café.');
     });
 }
 
-function setupActions(products, orders) {
-    const clearProducts = document.querySelector('[data-action="limpar-produtos"]');
-    const clearOrders = document.querySelector('[data-action="limpar-pedidos"]');
-    const refresh = document.querySelector('[data-action="atualizar-resumo"]');
+function setupAuthForms() {
+    const profile = loadFromStorage(STORAGE_KEYS.profile, {});
+    const loginForm = document.getElementById('login-form');
+    const registerForm = document.getElementById('register-form');
 
-    clearProducts?.addEventListener('click', () => {
-        saveToStorage(STORAGE_KEYS.products, []);
-        renderProducts(products.splice(0, products.length));
-    });
+    const loginFeedback = document.getElementById('login-feedback');
+    const registerFeedback = document.getElementById('registro-feedback');
 
-    clearOrders?.addEventListener('click', () => {
-        saveToStorage(STORAGE_KEYS.orders, []);
-        renderOrders(orders.splice(0, orders.length));
-        refreshHome(products, orders);
-    });
+    const loginEmail = loginForm?.querySelector('input[name="email"]');
+    if (loginEmail && profile.email) {
+        loginEmail.value = profile.email;
+    }
 
-    refresh?.addEventListener('click', () => refreshHome(products, orders));
+    if (loginForm) {
+        loginForm.querySelectorAll('input').forEach((input) => {
+            input.addEventListener('blur', () => validateField(input));
+            input.addEventListener('input', () => showFeedback(input, ''));
+        });
+
+        loginForm.addEventListener('submit', (event) => {
+            event.preventDefault();
+            const valid = Array.from(loginForm.elements)
+                .filter((el) => el.tagName === 'INPUT')
+                .every((field) => validateField(field));
+
+            if (!valid) return;
+
+            const data = new FormData(loginForm);
+            const email = data.get('email').trim();
+            const remember = data.get('lembrar');
+
+            saveToStorage(STORAGE_KEYS.profile, { ...profile, email, remember: Boolean(remember) });
+            setAlert(loginFeedback, `Login feito! Carrinho e piadas guardados para ${email || 'você'}.`);
+            loginForm.reset();
+        });
+    }
+
+    if (registerForm) {
+        const password = registerForm.querySelector('input[name="senha"]');
+        const confirm = registerForm.querySelector('input[name="confirmar"]');
+
+        registerForm.querySelectorAll('input').forEach((input) => {
+            input.addEventListener('blur', () => validateField(input));
+            input.addEventListener('input', () => showFeedback(input, ''));
+        });
+
+        registerForm.addEventListener('submit', (event) => {
+            event.preventDefault();
+            const valid = Array.from(registerForm.elements)
+                .filter((el) => el.tagName === 'INPUT')
+                .every((field) => validateField(field));
+
+            if (!valid) return;
+
+            if (password?.value !== confirm?.value) {
+                showFeedback(confirm, 'As senhas precisam combinar.');
+                return;
+            }
+
+            const data = new FormData(registerForm);
+            const nome = data.get('nome').trim();
+            const email = data.get('email').trim();
+
+            saveToStorage(STORAGE_KEYS.profile, { nome, email });
+            setAlert(registerFeedback, `Conta criada, ${nome || 'pessoa misteriosa'}! Bora encher o carrinho.`);
+            registerForm.reset();
+        });
+    }
 }
 
 (function init() {
     const products = loadFromStorage(STORAGE_KEYS.products, defaultProducts);
+    const cart = loadFromStorage(STORAGE_KEYS.cart, []);
     const orders = loadFromStorage(STORAGE_KEYS.orders, defaultOrders);
 
-    renderProducts(products);
-    renderOrders(orders);
-    refreshHome(products, orders);
-    setupProductForm(products, () => refreshHome(products, orders));
-    setupOrderForm(products, orders, () => refreshHome(products, orders));
-    setupActions(products, orders);
+    renderFeatured(products);
+    renderOrders(orders, 'recent-orders');
+    renderOrders(orders, 'order-history');
+    renderCatalog(products);
+    renderCart(cart);
+    refreshHome(products, orders, cart);
+    setupCatalog(products, cart, orders);
+    setupAuthForms();
 })();

@@ -3,87 +3,73 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema Comercial - Pedidos</title>
+    <title>Armazém do Seu Zé - Pedidos</title>
     <link rel="stylesheet" href="css/styles.css">
 </head>
 <body data-page="pedidos">
     <header class="topbar">
         <div class="brand">
-            <span class="brand__logo" aria-hidden="true">SC</span>
+            <span class="brand__logo" aria-hidden="true">SZ</span>
             <div>
-                <strong>Sistema Comercial</strong>
-                <p class="brand__subtitle">Gestão simples e conforme ISO 9241</p>
+                <strong>Armazém do Seu Zé (versão digital)</strong>
+                <p class="brand__subtitle">Pedidos transparentes e um sorriso de brinde.</p>
             </div>
         </div>
         <nav class="main-nav" aria-label="Navegação principal">
             <a href="index.html" class="main-nav__link">Início</a>
-            <a href="produtos.html" class="main-nav__link">Produtos</a>
+            <a href="catalogo.html" class="main-nav__link">Catálogo</a>
             <a href="pedidos.html" class="main-nav__link main-nav__link--active">Pedidos</a>
+            <a href="login.html" class="main-nav__link">Login</a>
+            <a href="registro.html" class="main-nav__link">Registro</a>
         </nav>
     </header>
 
-    <main class="layout layout--two">
-        <section class="panel" aria-labelledby="novo-pedido-title">
+    <main class="layout">
+        <section class="panel" aria-labelledby="meus-pedidos-title">
             <div class="panel__header">
                 <div>
-                    <p class="eyebrow">Registro</p>
-                    <h1 id="novo-pedido-title">Novo pedido</h1>
+                    <p class="eyebrow">Acompanhamento</p>
+                    <h1 id="meus-pedidos-title">Meus pedidos</h1>
                 </div>
-                <p class="muted">Selecione o produto e informe o cliente.</p>
-            </div>
-            <form class="stack" id="order-form" novalidate>
-                <label class="field">
-                    <span>Cliente *</span>
-                    <input type="text" name="cliente" placeholder="Nome do cliente" required>
-                    <small class="helper" data-feedback-for="cliente"></small>
-                </label>
-                <label class="field">
-                    <span>Produto *</span>
-                    <select name="produto" required>
-                        <option value="">Selecione</option>
-                    </select>
-                    <small class="helper" data-feedback-for="produto"></small>
-                </label>
-                <label class="field">
-                    <span>Quantidade *</span>
-                    <input type="number" name="quantidade" min="1" step="1" placeholder="1" required>
-                    <small class="helper" data-feedback-for="quantidade"></small>
-                </label>
-                <p class="muted" id="order-total" aria-live="polite">Total estimado: R$ 0,00</p>
-                <button type="submit" class="primary">Registrar pedido</button>
-            </form>
-        </section>
-
-        <section class="panel" aria-labelledby="tabela-pedidos-title">
-            <div class="panel__header">
-                <div>
-                    <p class="eyebrow">Controle</p>
-                    <h2 id="tabela-pedidos-title">Pedidos confirmados</h2>
-                </div>
-                <button type="button" class="ghost" data-action="limpar-pedidos">Limpar pedidos</button>
+                <a class="ghost" href="catalogo.html">Adicionar mais itens</a>
             </div>
             <div class="table-wrapper">
-                <table class="data-table" aria-describedby="tabela-pedidos-title">
+                <table class="data-table" aria-describedby="meus-pedidos-title">
                     <thead>
                         <tr>
+                            <th scope="col">Pedido</th>
                             <th scope="col">Cliente</th>
-                            <th scope="col">Produto</th>
-                            <th scope="col">Qtd.</th>
+                            <th scope="col">Itens</th>
                             <th scope="col">Total</th>
+                            <th scope="col">Status</th>
                         </tr>
                     </thead>
-                    <tbody id="order-list" aria-live="polite">
+                    <tbody id="order-history" aria-live="polite">
                         <tr>
-                            <td colspan="4" class="muted">Nenhum pedido registrado.</td>
+                            <td colspan="5" class="muted">Nenhuma compra registrada ainda.</td>
                         </tr>
                     </tbody>
                 </table>
             </div>
         </section>
+
+        <section class="panel" aria-labelledby="ajuda-title">
+            <div class="panel__header">
+                <div>
+                    <p class="eyebrow">Dica do balcão</p>
+                    <h2 id="ajuda-title">Quer acelerar a entrega?</h2>
+                </div>
+            </div>
+            <ul class="list">
+                <li>Use sempre o mesmo e-mail para a gente saber quem merece o café extra.</li>
+                <li>Deixe observações no carrinho se quiser algo especial (como um brinde de bom humor).</li>
+                <li>Volte ao catálogo quando quiser: seu carrinho continua guardado aqui.</li>
+            </ul>
+        </section>
     </main>
 
     <footer class="footer">
-        <p>Feedback imediato sobre totais e validação ajudam a reduzir erros (ISO 9241-110).</p>
+        <p>Pedidos claros, atendimento brincalhão e ISO 9241-110 garantindo legibilidade.</p>
     </footer>
 
     <script src="js/app.js"></script>
