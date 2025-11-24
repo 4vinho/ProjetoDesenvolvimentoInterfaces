@@ -88,21 +88,21 @@ function refreshHome(products, orders) {
 function renderProducts(products) {
     const list = document.getElementById('product-list');
     const select = document.querySelector('select[name="produto"]');
-    if (!list) return;
-
-    list.innerHTML = '';
-    if (products.length === 0) {
-        list.innerHTML = '<tr><td colspan="3" class="muted">Nenhum produto cadastrado.</td></tr>';
-    } else {
-        products.forEach((produto) => {
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td>${produto.nome}</td>
-                <td>${formatCurrency(produto.preco)}</td>
-                <td>${produto.estoque} un</td>
-            `;
-            list.appendChild(row);
-        });
+    if (list) {
+        list.innerHTML = '';
+        if (products.length === 0) {
+            list.innerHTML = '<tr><td colspan="3" class="muted">Nenhum produto cadastrado.</td></tr>';
+        } else {
+            products.forEach((produto) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${produto.nome}</td>
+                    <td>${formatCurrency(produto.preco)}</td>
+                    <td>${produto.estoque} un</td>
+                `;
+                list.appendChild(row);
+            });
+        }
     }
 
     if (select) {
