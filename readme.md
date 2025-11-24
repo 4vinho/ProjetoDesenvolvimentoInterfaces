@@ -1,6 +1,6 @@
-# Sistema Comercial Simples
+# Armazém do Seu Zé (versão digital)
 
-Projeto front-end responsivo com três telas independentes (Início, Produtos e Pedidos), seguindo princípios de usabilidade da ISO 9241.
+Projeto front-end responsivo com três telas independentes (Início, Produtos e Pedidos), feito a muitas xícaras de café e seguindo princípios de usabilidade da ISO 9241.
 
 ## Estrutura
 - `index.html`: visão geral com KPIs e pedidos recentes.
